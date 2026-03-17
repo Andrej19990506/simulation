@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kitchen Simulation</title>
+  <link rel="stylesheet" href="./css/style.css">
+  <script type="importmap">
+  {
+    "imports": {
+      "lit": "https://esm.sh/lit@3"
+    }
+  }
+  </script>
+</head>
+<body>
+
+  <!-- ─── HEADER ─── -->
+  <header id="appHeader">
+    <div class="header-left">
+      <h1>🍳 Kitchen Simulation</h1>
+      <small id="headerSubtitle">Настройка кухни и слотов</small>
+    </div>
+    <div class="header-right">
+      <button class="btn btn-play" id="btnPlay">▶ Запустить симуляцию</button>
+      <button class="btn btn-stop" id="btnStop" style="display:none">⏹ Остановить</button>
+    </div>
+  </header>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       SETTINGS VIEW (visible when simulation is NOT running)
+       ═══════════════════════════════════════════════════════════ -->
+  <settings-view id="settingsView"></settings-view>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       SIMULATION VIEW (visible when simulation IS running)
+       ═══════════════════════════════════════════════════════════ -->
+  <div id="simView" style="display:none">
+
+    <!-- Control Bar -->
+    <div class="sim-control-bar">
+      <div class="sim-ctrl-row">
+        <div class="sim-ctrl-group">
+          <button class="btn btn-sm btn-icon" id="btnSimPause" title="Пауза">⏸</button>
+          <button class="btn btn-sm btn-icon" id="btnSimResume" title="Продолжить" style="display:none">▶</button>
+        </div>
+        <div class="sim-ctrl-group">
+          <span class="sim-label">ВРЕМЯ</span>
+          <span class="sim-value sim-clock" id="simClock">--:--</span>
+        </div>
+        <div class="sim-ctrl-group">
+          <span class="sim-label">СКОРОСТЬ</span>
+          <input type="range" id="simSpeedSlider" min="1" max="600" value="120" class="speed-slider">
+          <span class="sim-value" id="simSpeedLabel">x120</span>
+        </div>
+        <div class="sim-ctrl-group">
+          <span class="sim-label">СЦЕНАРИЙ</span>
+          <span class="sim-value" id="simScenarioLabel">—</span>
+        </div>
+      </div>
+      <div class="sim-metrics-strip" id="simMetrics"></div>
+    </div>
+
+    <!-- Main Simulation Area (Lit Component) -->
+    <sim-view id="simViewComponent"></sim-view>
+
+  </div>
+
+  <!-- Modals (Lit Components) -->
+  <order-modal id="orderModalComponent"></order-modal>
+  <bottleneck-modal id="bottleneckModalComponent"></bottleneck-modal>
+  <shift-report-modal id="shiftReportModalComponent"></shift-report-modal>
+
+  <script type="module" src="./js/app.js"></script>
+</body>
+</html>

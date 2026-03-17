@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kitchen Slot Simulation</title>
+  <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Kitchen Slot Simulation</h1>
+      <small>Моделирование слотов, нагрузки и AssignSlot (First Fit)</small>
+    </div>
+    <div class="row" style="align-items:center;">
+      <div>
+        <label for="simTime">Симулируемое время</label>
+        <input id="simTime" type="datetime-local">
+      </div>
+      <button class="btn secondary" id="btnNow" style="margin-top:16px;">Сейчас</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="panel">
+      <h2>
+        Конфиг кухни
+        <span>станции и ёмкости</span>
+      </h2>
+      <div>
+        <div class="section-title">Станции (Capacity keys)</div>
+        <small>Пример: <code>orders, items, oven, fryer, assembly</code></small>
+        <textarea id="stationsConfig" spellcheck="false">[
+  "orders",
+  "items",
+  "oven",
+  "fryer",
+  "assembly"
+]</textarea>
+      </div>
+      <div class="divider"></div>
+      <div>
+        <div class="section-title">Слоты (Branch → Slots)</div>
+        <small>JSON: массив слотов с Capacity и Used</small>
+        <textarea id="slotsConfig" spellcheck="false">{
+  "branch-1": [
+    {
+      "id": "slot-1",
+      "startsAt": "2026-03-16T18:00:00Z",
+      "endsAt":   "2026-03-16T18:30:00Z",
+      "capacity": { "orders": 10, "oven": 600, "fryer": 300 },
+      "used":     { "orders": 2,  "oven": 120, "fryer": 60 },
+      "version": 0
+    },
+    {
+      "id": "slot-2",
+      "startsAt": "2026-03-16T18:30:00Z",
+      "endsAt":   "2026-03-16T19:00:00Z",
+      "capacity": { "orders": 8, "oven": 480, "fryer": 240 },
+      "used":     {},
+      "version": 0
+    }
+  ]
+}</textarea>
+      </div>
+      <div class="flex-between">
+        <div>
+          <label for="branchId">Филиал</label>
+          <input id="branchId" value="branch-1">
+        </div>
+        <button class="btn secondary" id="btnApplyConfig" style="margin-top:18px;">Применить конфиг</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>
+        Заказы и AssignSlot
+        <span>симуляция First Fit</span>
+      </h2>
+      <div class="row">
+        <div>
+          <label for="orderId">OrderID</label>
+          <input id="orderId" placeholder="order-123">
+        </div>
+        <div>
+          <label for="visibleAt">VisibleAt</label>
+          <input id="visibleAt" type="datetime-local">
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label for="minPrep">Guard window (MinPrepTime, минут)</label>
+          <input id="minPrep" type="number" value="10" min="0">
+        </div>
+        <div>
+          <label for="maxSlots">Max slots to check</label>
+          <input id="maxSlots" type="number" value="50" min="1">
+        </div>
+      </div>
+      <div>
+        <div class="section-title">Нагрузка заказа (CapacityVector)</div>
+        <small>JSON: ключи станций. Пример: <code>{"orders":1,"oven":180,"fryer":60}</code></small>
+        <textarea id="orderLoad" spellcheck="false">{
+  "orders": 1,
+  "oven": 180,
+  "fryer": 60
+}</textarea>
+      </div>
+      <div class="flex-between">
+        <button class="btn" id="btnAssign">AssignSlot()</button>
+        <div>
+          <span class="tag">First Fit</span>
+          <span class="tag">Optimistic Locking (Version)</span>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div>
+        <div class="section-title">Слоты филиала</div>
+        <div id="slotsList" class="list"></div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>
+        Состояние и лог
+        <span>симуляция времени и конфликтов</span>
+      </h2>
+      <div>
+        <div class="section-title">Текущее состояние слотов</div>
+        <div id="stateView" class="list" style="max-height:160px;"></div>
+      </div>
+      <div class="divider"></div>
+      <div class="flex-between">
+        <span class="section-title">Лог событий</span>
+        <button class="btn secondary" id="btnClearLog">Очистить лог</button>
+      </div>
+      <div id="log"></div>
+    </section>
+  </main>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>

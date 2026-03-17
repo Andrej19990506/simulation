@@ -1,0 +1,16 @@
+{
+  "name": "simulation-kitchen",
+  "version": "1.0.0",
+  "main": "simulation.html",
+  "scripts": {
+    "start": "serve .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "serve": "^14.2.6"
+  }
+}

@@ -1,0 +1,184 @@
+/* ─── RESPONSIVE BREAKPOINTS ─── */
+
+/* Tablet landscape (768–1024px) */
+@media (max-width: 1024px) {
+  header { padding: 8px 16px; }
+  .header-left h1 { font-size: 15px; }
+
+  .settings-tabs { padding: 0 16px; overflow-x: auto; flex-wrap: nowrap; }
+  .tab { padding: 8px 12px; font-size: 12px; white-space: nowrap; }
+  .tab-content { padding: 16px; }
+  .settings-grid { grid-template-columns: 1fr; }
+
+  .profile-bar { padding: 6px 16px; }
+
+  .sim-control-bar .sim-ctrl-row { padding: 6px 16px; gap: 12px; flex-wrap: wrap; }
+  .sim-metrics-strip { padding: 0 16px 6px; }
+
+  .sim-main {
+    grid-template-columns: 240px 1fr 260px;
+  }
+
+  sim-slots-panel,
+  sim-kitchen-panel,
+  sim-feed-panel { padding: 10px 12px; }
+
+  sim-slots-panel > h3,
+  sim-kitchen-panel > h3,
+  sim-feed-panel > h3 { font-size: 12px; }
+
+  .modal-content { width: 95vw; }
+  .shift-report-modal { max-width: 95vw; }
+  .bottleneck-modal { max-width: 95vw; }
+
+  .sr-kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  .bnm-stats { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* Tablet portrait (600–768px) */
+@media (max-width: 768px) {
+  header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 8px 12px;
+  }
+  .header-right { width: 100%; display: flex; gap: 6px; }
+  .header-right .btn { flex: 1; justify-content: center; font-size: 12px; }
+
+  .settings-tabs {
+    padding: 0 8px;
+    gap: 0;
+    -webkit-overflow-scrolling: touch;
+  }
+  .tab { padding: 8px 10px; font-size: 11px; }
+  .tab-content { padding: 12px; }
+
+  .sim-control-bar .sim-ctrl-row {
+    padding: 6px 12px;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .sim-metrics-strip {
+    padding: 0 12px 6px;
+    gap: 4px;
+  }
+  .ms-chip { padding: 2px 6px; }
+  .ms-val { font-size: 11px; }
+  .ms-lbl { font-size: 8px; }
+
+  .sim-main {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+    overflow: hidden;
+  }
+
+  sim-slots-panel,
+  sim-kitchen-panel,
+  sim-feed-panel {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    display: none;
+  }
+  sim-feed-panel { border-bottom: none; }
+
+  sim-slots-panel.panel-active,
+  sim-kitchen-panel.panel-active,
+  sim-feed-panel.panel-active {
+    display: flex;
+    flex: 1;
+    overflow: auto;
+  }
+
+
+  .sim-mobile-tabs {
+    display: flex !important;
+    gap: 0;
+    background: var(--bg-deep);
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .sim-mobile-tab {
+    flex: 1;
+    padding: 10px 4px;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-dim);
+    background: none;
+    border: none;
+    border-top: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .sim-mobile-tab:hover { color: var(--text); background: var(--bg-hover); }
+  .sim-mobile-tab.active {
+    color: var(--accent);
+    border-top-color: var(--accent);
+    background: rgba(59, 130, 246, 0.05);
+  }
+  .sim-mobile-tab-icon { display: block; font-size: 18px; margin-bottom: 2px; }
+
+  .modal-content { max-height: 90vh; border-radius: 8px; }
+  .modal-body { padding: 14px; }
+  .modal-timer { font-size: 18px; }
+
+  .order-feed { max-height: 180px; }
+  .active-orders-list { max-height: 150px; }
+  .order-queue { max-height: 150px; }
+
+  .sr-kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  .sr-table { font-size: 10px; }
+  .sr-table th, .sr-table td { padding: 4px 5px; }
+  .sr-grade { width: 48px; height: 48px; font-size: 18px; }
+}
+
+/* Mobile (< 480px) */
+@media (max-width: 480px) {
+  header { padding: 6px 10px; }
+  .header-left h1 { font-size: 14px; }
+  .header-left small { font-size: 10px; }
+
+  .sim-control-bar .sim-ctrl-row { padding: 4px 10px; gap: 6px; }
+  .sim-ctrl-group { gap: 4px; }
+  .sim-label { font-size: 9px; }
+  .sim-value { font-size: 11px; }
+  .sim-clock { font-size: 14px; }
+  .speed-slider { width: 70px; }
+
+  .sim-metrics-strip { padding: 0 10px 4px; }
+  .ms-chip { padding: 2px 5px; }
+
+  sim-slots-panel,
+  sim-kitchen-panel,
+  sim-feed-panel { padding: 8px 10px; }
+
+  .tab-content { padding: 10px; }
+
+  .cook-card { padding: 6px 8px; gap: 6px; }
+  .cook-card .cook-emoji { font-size: 18px; }
+  .cook-card .cook-name { font-size: 11px; }
+  .cook-card .cook-status { font-size: 9px; }
+
+  .slot-bar { padding: 5px 6px; }
+  .slot-bar .slot-bar-time { font-size: 10px; }
+
+  .feed-item { padding: 4px 6px; font-size: 10px; }
+  .feed-filter-btn { padding: 2px 6px; font-size: 9px; }
+
+  .modal-content { max-height: 95vh; border-radius: 6px; }
+  .modal-body { padding: 12px; }
+
+  .sr-kpi-grid { grid-template-columns: 1fr 1fr; gap: 6px; }
+  .sr-kpi { padding: 8px; }
+  .sr-kpi-val { font-size: 15px; }
+
+  .bnm-stats { grid-template-columns: 1fr 1fr; }
+
+  .tl-legend { gap: 4px; padding: 4px 6px; }
+  .tl-legend-item { font-size: 10px; }
+}
+
+/* Hide mobile tabs by default */
+.sim-mobile-tabs { display: none; }
