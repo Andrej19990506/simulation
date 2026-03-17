@@ -118,6 +118,10 @@ export class SimSlotsPanel extends BaseComponent {
       if (order.isLate) {
         const overSec = (order.execSec || 0) - order.deadlineSec;
         lines.push(html`<div class="sot-row sot-warn">⏰ Опоздал на ${_fmtSec(overSec)}</div>`);
+        if (order.fatigueAffected) {
+          const slowPct = Math.round((order.maxFatigue - 1) * 100);
+          lines.push(html`<div class="sot-row sot-warn">😓 Усталость повара: +${slowPct}% к времени</div>`);
+        }
       }
     }
 

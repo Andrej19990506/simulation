@@ -214,6 +214,27 @@ sim-feed-panel h4 {
   color: var(--warning);
 }
 
+.cook-fatigue {
+  display: flex; align-items: center; gap: 5px;
+  padding: 3px 12px 5px;
+  font-size: 10px; font-weight: 600;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+.cook-fatigue .fatigue-icon { font-size: 13px; }
+.cook-fatigue .fatigue-text { flex: 1; }
+.cook-fatigue.fatigue-mild {
+  color: #a3a3a3;
+  background: rgba(163,163,163,0.06);
+}
+.cook-fatigue.fatigue-warn {
+  color: #f59e0b;
+  background: rgba(245,158,11,0.08);
+}
+.cook-fatigue.fatigue-crit {
+  color: #ef4444;
+  background: rgba(239,68,68,0.1);
+}
+
 /* Equipment bar */
 .cook-eq-bar {
   display: flex;
@@ -836,6 +857,8 @@ sim-feed-panel h4 {
 
 .la-val { margin-left: auto; font-variant-numeric: tabular-nums; color: var(--text-muted); }
 .la-row-highlight .la-val { color: var(--danger); }
+.la-row-fatigue { color: #f59e0b; font-weight: 600; margin-top: 4px; }
+.la-dot.la-fatigue { background: #f59e0b; }
 
 /* ─── ORDER TIMELINE ─── */
 

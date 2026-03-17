@@ -197,6 +197,11 @@ export class OrderModal extends BaseComponent {
             <span></span><span><strong>Готовка</strong></span>
             <span class="la-val"><strong>${_fmtDuration(cookingSec)} / ${_fmtDuration(deadlineSec)}</strong></span>
           </div>
+          ${order.fatigueAffected ? html`
+            <div class="la-row la-row-fatigue">
+              <span class="la-dot la-fatigue"></span>
+              <span>😓 Усталость повара: +${Math.round((order.maxFatigue - 1) * 100)}% к времени готовки</span>
+            </div>` : nothing}
         </div>
       </div>`;
   }

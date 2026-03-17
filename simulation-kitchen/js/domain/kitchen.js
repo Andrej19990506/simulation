@@ -142,6 +142,9 @@ export function createKitchenState(config) {
       currentStageIdx: -1,
       cookingProgressSec: 0,
       equipmentId: null,
+      continuousWorkSec: 0,
+      idleAccumSec: 0,
+      fatigueMultiplier: 1.0,
     })),
     dishes: [...dishes],
     scheduledOrders: [],
@@ -439,10 +442,13 @@ export function tryAssignCooks(kitchen, simNow) {
     if (!stage || stage.status !== 'waiting') continue;
 
     const speedFactor = cook.speed || 1.0;
-    stage.totalTimeSec = Math.round(stage.timeSec * pos.quantity * speedFactor);
+    const fatigueMult = cook.fatigueMultiplier || 1.0;
+    const effectiveSpeed = speedFactor * fatigueMult;
+    stage.totalTimeSec = Math.round(stage.timeSec * pos.quantity * effectiveSpeed);
     stage.remainingSec = stage.totalTimeSec;
     stage.status = 'active';
     stage.cookId = cook.id;
+    if (fatigueMult > 1.01) stage.fatigueApplied = fatigueMult;
 
     cook.status = 'busy';
     cook.currentOrderId = order.id;
@@ -455,6 +461,7 @@ export function tryAssignCooks(kitchen, simNow) {
       type: 'stage_started',
       cookId: cook.id,
       cookName: cook.name,
+      cookFatigue: fatigueMult,
       orderId: order.id,
       dishName: pos.dishName,
       stageType: stage.type,
@@ -465,12 +472,47 @@ export function tryAssignCooks(kitchen, simNow) {
   return events;
 }
 
+const FATIGUE_THRESHOLD_SEC = 5 * 3600;
+const FATIGUE_MAX_MULT = 1.5;
+const FATIGUE_RAMP_PER_HOUR = 0.1;
+const REST_THRESHOLD_SEC = 60;
+const REST_RECOVERY_RATE = 0.5;
+
+export function getCookFatigueMultiplier(cook) {
+  return cook.fatigueMultiplier || 1.0;
+}
+
+function _updateCookFatigue(cook, deltaSimSec) {
+  if (cook.status === 'busy') {
+    cook.continuousWorkSec += deltaSimSec;
+    cook.idleAccumSec = 0;
+
+    if (cook.continuousWorkSec > FATIGUE_THRESHOLD_SEC) {
+      const overHours = (cook.continuousWorkSec - FATIGUE_THRESHOLD_SEC) / 3600;
+      cook.fatigueMultiplier = Math.min(FATIGUE_MAX_MULT, 1.0 + overHours * FATIGUE_RAMP_PER_HOUR);
+    }
+  } else {
+    cook.idleAccumSec += deltaSimSec;
+    if (cook.idleAccumSec >= REST_THRESHOLD_SEC) {
+      if (cook.fatigueMultiplier > 1.0) {
+        cook.fatigueMultiplier = Math.max(1.0, cook.fatigueMultiplier - deltaSimSec * REST_RECOVERY_RATE / 3600);
+      }
+      if (cook.fatigueMultiplier <= 1.01) {
+        cook.continuousWorkSec = Math.max(0, cook.continuousWorkSec - deltaSimSec * 2);
+        cook.fatigueMultiplier = 1.0;
+      }
+    }
+  }
+}
+
 export function tickKitchen(kitchen, deltaSimSec, simNow) {
   const events = [];
 
   events.push(..._tickEquipment(kitchen, deltaSimSec, simNow));
 
   for (const cook of kitchen.cooks) {
+    _updateCookFatigue(cook, deltaSimSec);
+
     if (cook.status !== 'busy') continue;
     if (cook.equipmentId) continue;
 
@@ -495,6 +537,7 @@ export function tickKitchen(kitchen, deltaSimSec, simNow) {
       events.push({
         type: 'stage_done',
         cookName: cook.name,
+        cookFatigue: cook.fatigueMultiplier,
         orderId: order.id,
         dishName: pos.dishName,
         stageType: stage.type,
@@ -611,6 +654,13 @@ function _completeOrder(kitchen, order, simNow, events) {
   const cookingSec = (order.completedAt - baseTime) / 1000;
   order.execSec = cookingSec;
   order.isLate = cookingSec > order.deadlineSec;
+
+  const hasFatigue = order.positions.some(p => p.stages.some(s => s.fatigueApplied > 1.01));
+  if (hasFatigue) {
+    order.fatigueAffected = true;
+    const maxFat = Math.max(...order.positions.flatMap(p => p.stages.map(s => s.fatigueApplied || 1)));
+    order.maxFatigue = maxFat;
+  }
 
   const idx = kitchen.activeOrders.indexOf(order);
   if (idx >= 0) kitchen.activeOrders.splice(idx, 1);

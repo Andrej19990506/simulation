@@ -1,6 +1,74 @@
 import { migrateDish } from '../../domain/dishes.js';
 import { fmtSec } from '../helpers.js';
 
+const FOOD_EMOJIS = [
+  { label: 'Пиццы и хлеб', items: ['🍕', '🥖', '🥐', '🍞', '🫓', '🥯', '🥨', '🧀', '🫕'] },
+  { label: 'Мясо и птица', items: ['🍖', '🍗', '🥩', '🥓', '🌭', '🍔', '🫔', '🌮', '🌯', '🥙'] },
+  { label: 'Морепродукты', items: ['🍣', '🍤', '🦐', '🦞', '🦀', '🐟', '🐠', '🦑'] },
+  { label: 'Азиатская', items: ['🍜', '🍝', '🍲', '🍛', '🍚', '🍙', '🍘', '🥟', '🥠', '🥡'] },
+  { label: 'Салаты и овощи', items: ['🥗', '🥬', '🥒', '🍅', '🥕', '🌽', '🥦', '🧅', '🧄', '🥑'] },
+  { label: 'Закуски', items: ['🥚', '🍳', '🧇', '🥞', '🫘', '🥜', '🫒', '🥫', '🧈'] },
+  { label: 'Фри и снэки', items: ['🍟', '🥔', '🧆', '🥘', '🫙'] },
+  { label: 'Десерты', items: ['🍰', '🎂', '🧁', '🍩', '🍪', '🍫', '🍬', '🍭', '🍮', '🧊'] },
+  { label: 'Напитки', items: ['☕', '🍵', '🧃', '🥤', '🍺', '🍷', '🥂', '🧋', '🫖'] },
+  { label: 'Фрукты', items: ['🍎', '🍐', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🫐', '🥝', '🍑', '🥭'] },
+  { label: 'Другое', items: ['🍽️', '🥣', '🥄', '🔪', '🧑‍🍳', '📦', '🛒'] },
+];
+
+function _createEmojiPicker(currentEmoji, onSelect) {
+  const wrap = document.createElement('div');
+  wrap.className = 'emoji-picker-wrap';
+
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'emoji-picker-btn';
+  btn.textContent = currentEmoji || '🍽️';
+  btn.title = 'Выбрать эмодзи';
+
+  const popup = document.createElement('div');
+  popup.className = 'emoji-picker-popup';
+
+  for (const group of FOOD_EMOJIS) {
+    const groupLabel = document.createElement('div');
+    groupLabel.className = 'emoji-group-label';
+    groupLabel.textContent = group.label;
+    popup.appendChild(groupLabel);
+
+    const grid = document.createElement('div');
+    grid.className = 'emoji-grid';
+    for (const em of group.items) {
+      const emBtn = document.createElement('button');
+      emBtn.type = 'button';
+      emBtn.className = 'emoji-item';
+      if (em === currentEmoji) emBtn.classList.add('selected');
+      emBtn.textContent = em;
+      emBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        btn.textContent = em;
+        popup.classList.remove('open');
+        onSelect(em);
+      });
+      grid.appendChild(emBtn);
+    }
+    popup.appendChild(grid);
+  }
+
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const wasOpen = popup.classList.contains('open');
+    document.querySelectorAll('.emoji-picker-popup.open').forEach(p => p.classList.remove('open'));
+    if (!wasOpen) popup.classList.add('open');
+  });
+
+  wrap.appendChild(btn);
+  wrap.appendChild(popup);
+  return wrap;
+}
+
+document.addEventListener('click', () => {
+  document.querySelectorAll('.emoji-picker-popup.open').forEach(p => p.classList.remove('open'));
+});
+
 const STAGE_DEFS = [
   { key: 'prep',     stationKey: 'station',         timeKey: 'prepTimeSec',     label: 'Готовка',     required: true },
   { key: 'baking',   stationKey: 'bakingStation',   timeKey: 'bakingTimeSec',   label: 'Выпекание',   required: false },
@@ -32,10 +100,10 @@ export function renderMenuEditor(dishes, stations, onChange) {
     const header = document.createElement('div');
     header.className = 'dish-header';
 
-    const emojiInput = document.createElement('input');
-    emojiInput.className = 'dish-emoji-input';
-    emojiInput.value = dish.emoji || '🍽️';
-    emojiInput.addEventListener('change', () => { dish.emoji = emojiInput.value; onChange(); });
+    const emojiPicker = _createEmojiPicker(dish.emoji || '🍽️', (em) => {
+      dish.emoji = em;
+      onChange();
+    });
 
     const nameInput = document.createElement('input');
     nameInput.className = 'dish-name-input';
@@ -55,7 +123,7 @@ export function renderMenuEditor(dishes, stations, onChange) {
     priceWrap.appendChild(priceInput);
     priceWrap.appendChild(rub);
 
-    header.appendChild(emojiInput);
+    header.appendChild(emojiPicker);
     header.appendChild(nameInput);
     header.appendChild(priceWrap);
     card.appendChild(header);

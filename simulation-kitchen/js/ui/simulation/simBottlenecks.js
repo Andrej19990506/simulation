@@ -14,6 +14,7 @@ export function renderBottlenecks(kitchen, simNow) {
 
   _checkStationQueues(kitchen, issues);
   _checkCookLoad(kitchen, issues);
+  _checkCookFatigue(kitchen, issues);
   _checkEquipment(kitchen, issues);
   _checkLateOrders(kitchen, simNow, issues);
   _checkClientRefusals(kitchen, issues);
@@ -105,6 +106,34 @@ function _checkCookLoad(kitchen, issues) {
       });
     }
   }
+}
+
+function _checkCookFatigue(kitchen, issues) {
+  const tiredCooks = kitchen.cooks.filter(c => (c.fatigueMultiplier || 1) > 1.01);
+  if (tiredCooks.length === 0) return;
+
+  const worst = tiredCooks.reduce((a, b) => (b.fatigueMultiplier > a.fatigueMultiplier ? b : a));
+  const worstPct = Math.round((worst.fatigueMultiplier - 1) * 200);
+  const speedPct = Math.round((1 / worst.fatigueMultiplier) * 100);
+  const workHours = Math.round(worst.continuousWorkSec / 3600 * 10) / 10;
+
+  const details = tiredCooks.map(c => {
+    const sp = Math.round((1 / (c.fatigueMultiplier || 1)) * 100);
+    const hrs = Math.round(c.continuousWorkSec / 3600 * 10) / 10;
+    return `${c.emoji} ${c.name}: ${sp}% скорость (${hrs}ч работы)`;
+  }).join(' · ');
+
+  const severity = worst.fatigueMultiplier >= 1.3 ? 3 : worst.fatigueMultiplier >= 1.15 ? 2 : 1;
+
+  issues.push({
+    type: 'cook_fatigue',
+    data: { cookIds: tiredCooks.map(c => c.id), worstCookId: worst.id },
+    icon: '😓',
+    title: `Усталость: ${tiredCooks.length} повар(а)`,
+    detail: details,
+    severity,
+    bar: Math.min(worstPct, 100),
+  });
 }
 
 function _checkEquipment(kitchen, issues) {

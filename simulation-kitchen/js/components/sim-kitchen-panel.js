@@ -27,6 +27,20 @@ export class SimKitchenPanel extends BaseComponent {
     }));
   }
 
+  _renderFatigueBadge(cook) {
+    const fm = cook.fatigueMultiplier || 1.0;
+    if (fm <= 1.01) return nothing;
+    const slowPct = Math.round((fm - 1) * 100);
+    const speedPct = Math.round((1 / fm) * 100);
+    const workH = Math.round(cook.continuousWorkSec / 3600 * 10) / 10;
+    const cls = fm >= 1.3 ? 'fatigue-crit' : fm >= 1.15 ? 'fatigue-warn' : 'fatigue-mild';
+    return html`
+      <div class="cook-fatigue ${cls}">
+        <span class="fatigue-icon">😓</span>
+        <span class="fatigue-text">Скорость ${speedPct}% · +${slowPct}% к времени · ${workH}ч работы</span>
+      </div>`;
+  }
+
   _renderCook(cook, eqStatus) {
     const k = this.kitchen;
 
@@ -38,6 +52,7 @@ export class SimKitchenPanel extends BaseComponent {
             <span class="cook-name">${cook.name}</span>
             <span class="cook-badge idle">Свободен</span>
           </div>
+          ${this._renderFatigueBadge(cook)}
         </div>`;
     }
 
@@ -89,6 +104,8 @@ export class SimKitchenPanel extends BaseComponent {
             <span class="eq-free-tag">${eq.free} своб.</span>
           </span>
         </div>
+
+        ${this._renderFatigueBadge(cook)}
 
         <div class="cook-orders-list">
           ${[...orderGroups.entries()].map(([orderId, items]) =>
@@ -167,6 +184,8 @@ export class SimKitchenPanel extends BaseComponent {
           <span class="cook-name">${cook.name}</span>
           <span class="cook-badge working">${stageLabel}</span>
         </div>
+
+        ${this._renderFatigueBadge(cook)}
 
         <div class="cook-order-group" @click=${() => order && this._onOrderClick(order.id)}>
           <div class="cook-order-group-header">
